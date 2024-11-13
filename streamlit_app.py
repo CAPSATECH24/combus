@@ -841,6 +841,212 @@ if st.button("✅ Calcular"):
             # Opcional: Añadir una imagen o gráfico adicional para reforzar la recomendación
             # st.image("path_to_image.jpg", caption="Optimiza tu flota con nuestro servicio", use_column_width=True)
 
+        # Pestaña "Datos Recopilados"
+        with tabs[3]:
+            st.subheader("📊 Datos Recopilados")
+            
+            # Estilo personalizado para las tablas
+            table_style = """
+            <style>
+                .metric-row {
+                    background-color: #f8f9fa;
+                    padding: 10px;
+                    border-radius: 5px;
+                    margin: 5px 0;
+                }
+            </style>
+            """
+            st.markdown(table_style, unsafe_allow_html=True)
+            
+            # Sección de Unidad Individual con diseño mejorado
+            st.markdown("## 📦 Unidad Individual")
+            
+            # Crear columnas para métricas principales
+            col1_unit, col2_unit, col3_unit = st.columns(3)
+            
+            with col1_unit:
+                create_metric_card(
+                    title="⏱️ Tiempo Total",
+                    value=f"{st.session_state.total_minutes:,} min",
+                    subtitle="Tiempo total registrado",
+                    color="#28a745"
+                )
+            
+            with col2_unit:
+                create_metric_card(
+                    title="⛽ Consumo Total",
+                    value=f"{st.session_state.combustible_total:.2f} L",
+                    subtitle="Consumo total de combustible",
+                    color="#66B2FF"
+                )
+            
+            with col3_unit:
+                create_metric_card(
+                    title="💰 Costo Total",
+                    value=f"${st.session_state.costo_total:,.2f}",
+                    subtitle="Costo total operativo",
+                    color="#FF6666"
+                )
+            
+            st.markdown("### 📊 Desglose Detallado - Unidad Individual")
+            
+            # Crear DataFrame para unidad individual con colores
+            data_recopilados_unit = {
+                'Concepto': [
+                    '⏱️ Tiempo en Ralentí',
+                    '🚗 Tiempo en Movimiento',
+                    '⌛ Tiempo Total',
+                    '🔥 Consumo en Ralentí',
+                    '⛽ Consumo en Movimiento',
+                    '📊 Consumo Total',
+                    '💸 Costo en Ralentí (100%)',
+                    '💰 Costo en Ralentí Real',
+                    '🚛 Costo en Movimiento',
+                    '💵 Costo Total',
+                    '📉 Merma Diaria Real',
+                    '📊 Merma Semanal Real',
+                    '📈 Merma Mensual Real',
+                    '💹 Merma Anual Real'
+                ],
+                'Valor': [
+                    f"{st.session_state.idle_minutes:,} min",
+                    f"{st.session_state.moving_minutes:,} min",
+                    f"{st.session_state.total_minutes:,} min",
+                    f"{st.session_state.combustible_ralenti:.2f} L",
+                    f"{st.session_state.combustible_movimiento:.2f} L",
+                    f"{st.session_state.combustible_total:.2f} L",
+                    f"${st.session_state.costo_ralenti:,.2f}",
+                    f"${st.session_state.costo_ralenti_real_unit:,.2f}",
+                    f"${st.session_state.costo_movimiento:,.2f}",
+                    f"${st.session_state.costo_total:,.2f}",
+                    f"${st.session_state.merma_diaria_real_unit:,.2f}",
+                    f"${st.session_state.merma_semanal_real_unit:,.2f}",
+                    f"${st.session_state.merma_mensual_real_unit:,.2f}",
+                    f"${st.session_state.merma_anual_real_unit:,.2f}"
+                ]
+            }
+            df_recopilados_unit = pd.DataFrame(data_recopilados_unit)
+            
+            # Aplicar estilo personalizado a la tabla
+            def style_dataframe(df):
+                return df.style\
+                    .apply(color_merma, axis=1)\
+                    .set_properties(**{
+                        'background-color': '#f8f9fa',
+                        'color': '#212529',
+                        'border': '1px solid #dee2e6',
+                        'padding': '0.75rem',
+                        'font-size': '1rem'
+                    })\
+                    .set_table_styles([
+                        {'selector': 'th', 'props': [
+                            ('background-color', '#28a745'),
+                            ('color', 'white'),
+                            ('font-weight', 'bold'),
+                            ('text-align', 'center')
+                        ]},
+                        {'selector': 'td', 'props': [
+                            ('text-align', 'left')
+                        ]}
+                    ])
+            
+            st.dataframe(style_dataframe(df_recopilados_unit), use_container_width=True)
+            
+            st.markdown("---")
+            
+            # Sección de Flota Completa con diseño mejorado
+            st.markdown("## 🚛 Flota Completa")
+            
+            # Crear columnas para métricas principales de flota
+            col1_fleet, col2_fleet, col3_fleet = st.columns(3)
+            
+            with col1_fleet:
+                create_metric_card(
+                    title="⏱️ Tiempo Total Flota",
+                    value=f"{st.session_state.total_minutes * num_unidades:,} min",
+                    subtitle="Tiempo total de la flota",
+                    color="#28a745"
+                )
+            
+            with col2_fleet:
+                create_metric_card(
+                    title="⛽ Consumo Total Flota",
+                    value=f"{st.session_state.combustible_total * num_unidades:.2f} L",
+                    subtitle="Consumo total de la flota",
+                    color="#66B2FF"
+                )
+            
+            with col3_fleet:
+                create_metric_card(
+                    title="💰 Costo Total Flota",
+                    value=f"${st.session_state.costo_total * num_unidades:,.2f}",
+                    subtitle="Costo total de la flota",
+                    color="#FF6666"
+                )
+            
+            st.markdown("### 📊 Desglose Detallado - Flota Completa")
+            
+            # Crear DataFrame para flota completa con colores
+            data_recopilados_fleet = {
+                'Concepto': [
+                    '⏱️ Tiempo en Ralentí',
+                    '🚗 Tiempo en Movimiento',
+                    '⌛ Tiempo Total',
+                    '🔥 Consumo en Ralentí',
+                    '⛽ Consumo en Movimiento',
+                    '📊 Consumo Total',
+                    '💸 Costo en Ralentí (100%)',
+                    '💰 Costo en Ralentí Real',
+                    '🚛 Costo en Movimiento',
+                    '💵 Costo Total',
+                    '📉 Merma Diaria Real',
+                    '📊 Merma Semanal Real',
+                    '📈 Merma Mensual Real',
+                    '💹 Merma Anual Real'
+                ],
+                'Valor': [
+                    f"{st.session_state.idle_minutes * num_unidades:,} min",
+                    f"{st.session_state.moving_minutes * num_unidades:,} min",
+                    f"{st.session_state.total_minutes * num_unidades:,} min",
+                    f"{st.session_state.combustible_ralenti * num_unidades:.2f} L",
+                    f"{st.session_state.combustible_movimiento * num_unidades:.2f} L",
+                    f"{st.session_state.combustible_total * num_unidades:.2f} L",
+                    f"${st.session_state.costo_ralenti * num_unidades:,.2f}",
+                    f"${st.session_state.costo_ralenti_real_fleet:,.2f}",
+                    f"${st.session_state.costo_movimiento * num_unidades:,.2f}",
+                    f"${st.session_state.costo_total * num_unidades:,.2f}",
+                    f"${st.session_state.merma_diaria_real_fleet:,.2f}",
+                    f"${st.session_state.merma_semanal_real_fleet:,.2f}",
+                    f"${st.session_state.merma_mensual_real_fleet:,.2f}",
+                    f"${st.session_state.merma_anual_real_fleet:,.2f}"
+                ]
+            }
+            df_recopilados_fleet = pd.DataFrame(data_recopilados_fleet)
+            st.dataframe(style_dataframe(df_recopilados_fleet), use_container_width=True)
+            
+            # Mostrar el porcentaje de ralentí real considerado con estilo mejorado
+            st.markdown("---")
+            
+            # Crear un contenedor estilizado para el porcentaje de ralentí
+            st.markdown(
+                f"""
+                <div style="
+                    background-color: #28a745;
+                    padding: 20px;
+                    border-radius: 10px;
+                    color: white;
+                    text-align: center;
+                    margin: 20px 0;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                ">
+                    <h2 style="margin: 0;">📊 Porcentaje de Ralentí Real</h2>
+                    <h1 style="font-size: 3em; margin: 10px 0;">{st.session_state.real_idle_percentage}%</h1>
+                    <p style="margin: 0;">Porcentaje considerado como merma en los cálculos</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
         # Pestaña 5: Análisis Económico
         with tabs[4]:
             st.subheader("💡 Análisis Económico")
